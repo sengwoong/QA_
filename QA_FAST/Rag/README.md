@@ -2,6 +2,16 @@
 
 sabangnet_API 프로젝트의 전체 코드베이스를 분석하여 질문-답변을 제공하는 고도화된 RAG(Retrieval-Augmented Generation) 시스템입니다.
 
+사용방법
+
+### 2. 대화형 모드 실행
+```bash
+# 실시간 질문-답변 시스템 시작
+python3 run_rag_system.py
+
+python3 run_rag_system.py test
+```
+
 
 # 테스팅결과
 ```
