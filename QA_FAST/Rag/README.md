@@ -1,0 +1,231 @@
+# sabangnet_API RAG 시스템
+
+sabangnet_API 프로젝트의 전체 코드베이스를 분석하여 질문-답변을 제공하는 고도화된 RAG(Retrieval-Augmented Generation) 시스템입니다.
+
+## 주요 기능
+
+- **의미 기반 코드 분석**: Python 파일을 클래스, 함수, API 엔드포인트 단위로 지능적 분할
+- **컨텍스트 기반 임베딩**: 파일 경로, 메타데이터, 비즈니스 도메인 정보를 포함한 풍부한 컨텍스트
+- **질문 유형별 검색 전략**: 질문의 의도에 따라 다른 검색 전략 적용
+- **GPT 기반 답변 생성**: OpenAI GPT를 활용한 자연스럽고 정확한 답변
+- **실시간 대화형 인터페이스**: 자유로운 질문-답변 대화
+
+## 설치 및 실행
+
+### 1. 의존성 설치
+
+```bash
+cd Rag
+pip install -r requirements.txt
+```
+
+### 2. 대화형 모드 실행
+
+```bash
+python run_rag_system.py
+```
+
+### 3. 테스트 모드 실행 (데모 질문들로 시스템 테스트)
+
+```bash
+python run_rag_system.py test
+```
+
+### 4. 환경변수 설정
+
+`.env` 파일을 생성하고 OpenAI API 키를 설정하세요:
+
+```bash
+# .env 파일 생성
+echo "GPTKEY=your_openai_api_key_here" > .env
+```
+
+## 질문 유형별 검색 전략
+
+### 1. "어떻게" 질문 (How-to)
+- **검색 전략**: 프로세스 기반 검색
+- **우선순위**: 함수, API 엔드포인트, 서비스 로직
+- **예시**: "주문 데이터는 어떻게 처리되나요?", "상품 등록은 어떻게 작동하나요?"
+
+### 2. "어디에" 질문 (Location)
+- **검색 전략**: 메타데이터 기반 검색
+- **우선순위**: 파일 경로, 테이블명, API 엔드포인트
+- **예시**: "주문 관련 파일은 어디에 있나요?", "smile_erp_data 테이블은 어디에 정의되어 있나요?"
+
+### 3. "무엇" 질문 (What-is)
+- **검색 전략**: 의미 기반 검색
+- **우선순위**: 클래스, 모델, 구조 정의
+- **예시**: "데이터베이스 구조는 무엇인가요?", "배치 작업이 무엇인가요?"
+
+## 지원하는 질문 예시
+
+### 데이터베이스 관련
+- "데이터베이스는 어떻게 구성되어 있나요?"
+- "smile_erp_data 테이블은 어떻게 구성되어 있나요?"
+- "receive_orders 테이블의 구조는 무엇인가요?"
+
+### API 및 컨트롤러 관련
+- "주문 수집 API는 어떻게 작동하나요?"
+- "상품 등록 컨트롤러의 기능은 무엇인가요?"
+- "지마켓에 물건을 보내려면 어떤 API를 써야 하나요?"
+
+### 서비스 및 로직 관련
+- "주문 생성 서비스의 로직은 무엇인가요?"
+- "배치 작업은 어떻게 구현되어 있나요?"
+- "스마일배송 주문 데이터는 어떻게 처리되나요?"
+
+## 시스템 구조
+
+```
+Rag/
+├── rag_system.py          # 메인 RAG 시스템
+├── run_rag_system.py      # 실행 스크립트
+├── requirements.txt       # 의존성 목록
+├── README.md             # 이 파일
+└── sabangnet_rag.db      # SQLite 데이터베이스 (자동 생성)
+```
+
+## 기술 스택
+
+- **Faiss**: 고성능 벡터 검색
+- **Sentence Transformers**: 다국어 텍스트 임베딩
+- **OpenAI GPT**: 자연어 답변 생성
+- **SQLite**: 문서 및 임베딩 저장
+- **Python 3.8+**: 메인 프로그래밍 언어
+
+## 사용 예시
+
+### 대화형 모드
+```python
+❓ 질문을 입력하세요: 주문 데이터는 어떻게 처리되나요?
+
+🔍 검색 중...
+
+💡 답변:
+주문 데이터 처리는 다음과 같은 단계로 이루어집니다:
+
+1. **주문 수집**: `ReceiveOrderCreateService`를 통해 사방넷 API에서 주문 데이터를 수집합니다.
+2. **데이터 변환**: XML 형태의 주문 데이터를 파싱하여 데이터베이스에 저장할 수 있는 형태로 변환합니다.
+3. **데이터베이스 저장**: `receive_orders` 테이블에 주문 정보를 저장합니다.
+
+관련 파일:
+- `services/receive_orders/receive_order_create_service.py`: 주문 생성 서비스
+- `models/receive_orders/receive_orders.py`: 주문 데이터 모델
+- `api/v1/endpoints/receive_order.py`: 주문 수집 API 엔드포인트
+```
+
+### 프로그래밍 방식
+```python
+from rag_system import SabangnetRAGSystem
+
+# RAG 시스템 초기화
+rag = SabangnetRAGSystem()
+
+# 문서 추출 및 인덱스 구축
+rag.extract_sabangnet_documents()
+rag._build_faiss_index()
+
+# 질문-답변
+answer = rag.answer_question("지마켓에 물건을 보내려면 어떤 API를 써야 하나요?")
+print(answer)
+```
+
+## 주요 개선사항
+
+### 1. 의미 기반 코드 분석
+- Python 파일을 클래스, 함수, API 엔드포인트 단위로 지능적 분할
+- 테이블 모델, 서비스 로직, 컨트롤러 등을 구분하여 분석
+- 코드 구조를 이해한 상태에서 임베딩 생성
+
+### 2. 컨텍스트 기반 임베딩
+- 파일 경로, 메타데이터, 비즈니스 도메인 정보를 포함
+- 함수명, 클래스명, API 엔드포인트, 테이블명 등 구조적 정보 활용
+- 질문에 더 정확하게 답변할 수 있는 풍부한 컨텍스트 제공
+
+### 3. 질문 유형별 검색 전략
+- **"어떻게" 질문**: 프로세스 기반 검색 (함수, API, 서비스 로직 우선)
+- **"어디에" 질문**: 메타데이터 기반 검색 (파일 경로, 테이블명 우선)
+- **"무엇" 질문**: 의미 기반 검색 (클래스, 모델, 구조 정의 우선)
+
+### 4. GPT 기반 답변 생성
+- 질문 유형에 따른 맞춤형 시스템 프롬프트
+- 단계별 설명, 구체적인 예시, 정확한 경로 정보 제공
+- 자연스럽고 유용한 답변 생성
+
+## 주의사항
+
+1. **sabangnet_API 경로**: `../sabangnet_API` 경로에 sabangnet_API 프로젝트가 있어야 합니다.
+2. **OpenAI API 키**: `.env` 파일에 `GPTKEY` 환경변수를 설정해야 합니다.
+3. **메모리 사용량**: 대용량 코드베이스의 경우 메모리 사용량이 클 수 있습니다.
+4. **첫 실행 시간**: 첫 실행 시 문서 추출 및 인덱스 구축에 시간이 걸릴 수 있습니다.
+
+## 문제 해결
+
+### 벡터 검색 라이브러리 설치 오류
+```bash
+pip install faiss-cpu sentence-transformers openai python-dotenv
+```
+
+### OpenAI API 키 설정 오류
+```bash
+# .env 파일 생성 및 API 키 설정
+echo "GPTKEY=your_openai_api_key_here" > .env
+```
+
+### sabangnet_API 경로 오류
+```python
+# rag_system.py에서 경로 수정
+rag = SabangnetRAGSystem(sabangnet_path="올바른_경로/sabangnet_API")
+```
+
+### 메모리 부족 오류
+- 더 작은 청크 크기로 분할
+- 벡터 모델을 더 작은 모델로 변경
+- 배치 크기 조정
+
+### GPT API 호출 실패
+- OpenAI API 키가 올바른지 확인
+- 인터넷 연결 상태 확인
+- API 사용량 한도 확인
+
+## 실행 방법
+
+### 1. 환경 설정
+```bash
+# 프로젝트 디렉토리로 이동
+cd /Users/gangseong-ung/Downloads/reactnative/QA_/QA_FAST/Rag
+
+# 의존성 설치
+python3 -m pip install -r requirements.txt
+
+# OpenAI API 키 설정
+echo "GPTKEY=your_openai_api_key_here" > .env
+```
+
+### 2. 대화형 모드 실행
+```bash
+# 실시간 질문-답변 시스템 시작
+python3 run_rag_system.py
+```
+
+실행 후 다음과 같이 질문할 수 있습니다:
+```
+❓ 질문을 입력하세요: 주문 데이터는 어떻게 처리되나요?
+❓ 질문을 입력하세요: 지마켓 API는 어디에 있나요?
+❓ 질문을 입력하세요: 데이터베이스 테이블 구조는 무엇인가요?
+```
+
+### 3. 테스트 모드 실행
+```bash
+# 데모 질문들로 시스템 테스트
+python3 run_rag_system.py test
+```
+
+### 4. 종료 방법
+- 대화형 모드에서 `quit`, `exit`, `종료` 입력
+- 또는 `Ctrl+C`로 강제 종료
+
+### 5. 첫 실행 시 주의사항
+- 첫 실행 시 sabangnet_API에서 문서 추출 및 인덱스 구축에 시간이 걸릴 수 있습니다
+- sabangnet_API 프로젝트가 `../sabangnet_API` 경로에 있어야 합니다
+- OpenAI API 키가 설정되어 있어야 GPT 기반 답변을 받을 수 있습니다
